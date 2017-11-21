@@ -8,16 +8,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.lmig.gfc.rpn.models.OneArgumentUndoer;
+import com.lmig.gfc.rpn.models.PushUndoer;
 import com.lmig.gfc.rpn.models.TwoArgumentUndoer;
+import com.lmig.gfc.rpn.models.Undoer;
 
 @Controller
 public class CalculatorController {
 	
 	private Stack<Double> stack;
-	private OneArgumentUndoer undoer;
+	private Stack<Undoer> undoers;
 	
 	public CalculatorController() {
 		stack = new Stack<Double>();
+		undoers = new Stack<Undoer>();
 	}
 
 	@GetMapping("/")
@@ -26,14 +29,14 @@ public class CalculatorController {
 		mv.setViewName("calculator");
 		mv.addObject("stack", stack);
 		mv.addObject("hasTwoOrMoreNumbers", stack.size() >= 2);
-		mv.addObject("hasUndoer", undoer != null);
+		mv.addObject("hasUndoer", undoers.size() > 0);
 		return mv;
 	}
 	
 	@PostMapping("/enter")
 	public ModelAndView pushNumberOntoStack(double value) {
 		stack.push(value);
-		undoer = null;
+		undoers.push(new PushUndoer());
 		
 		ModelAndView mv = new ModelAndView();
 		mv.setViewName("redirect:/");
@@ -43,7 +46,7 @@ public class CalculatorController {
 	@PostMapping("/abs")
 	public ModelAndView absoluteValue() {
 		double value = stack.pop();
-		undoer = new OneArgumentUndoer(value);
+		undoers.push(new OneArgumentUndoer(value));
 		
 //		double result = Math.abs(value);
 		if (value < 0) {
@@ -62,7 +65,7 @@ public class CalculatorController {
 		double second = stack.pop();
 		double result = first + second;
 		stack.push(result);
-		undoer = new TwoArgumentUndoer(first, second);
+		undoers.push(new TwoArgumentUndoer(first, second));
 		
 		ModelAndView mv = new ModelAndView();
 		mv.setViewName("redirect:/");
@@ -75,7 +78,7 @@ public class CalculatorController {
 		double second = stack.pop();
 		double result = second - first;
 		stack.push(result);
-		undoer = new TwoArgumentUndoer(first, second);
+		undoers.push(new TwoArgumentUndoer(first, second));
 
 		ModelAndView mv = new ModelAndView();
 		mv.setViewName("redirect:/");
@@ -84,8 +87,8 @@ public class CalculatorController {
 	
 	@PostMapping("/undo")
 	public ModelAndView undo() {
+		Undoer undoer = undoers.pop();
 		undoer.undo(stack);
-		undoer = null;
 		
 		ModelAndView mv = new ModelAndView();
 		mv.setViewName("redirect:/");

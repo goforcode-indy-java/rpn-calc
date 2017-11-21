@@ -7,9 +7,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.lmig.gfc.rpn.models.AddTwoNumbersTogether;
+import com.lmig.gfc.rpn.models.DivideTwoNumbersTogether;
+import com.lmig.gfc.rpn.models.ExponentiateTwoNumbersTogether;
+import com.lmig.gfc.rpn.models.MultiplyTwoNumbersTogether;
 import com.lmig.gfc.rpn.models.OneArgumentUndoer;
 import com.lmig.gfc.rpn.models.PushUndoer;
-import com.lmig.gfc.rpn.models.TwoArgumentUndoer;
+import com.lmig.gfc.rpn.models.SubtractTwoNumbersTogether;
+import com.lmig.gfc.rpn.models.TwoNumberCalculation;
 import com.lmig.gfc.rpn.models.Undoer;
 
 @Controller
@@ -28,6 +33,7 @@ public class CalculatorController {
 		ModelAndView mv = new ModelAndView();
 		mv.setViewName("calculator");
 		mv.addObject("stack", stack);
+		mv.addObject("hasOneOrMoreNumbers", stack.size() >= 1);
 		mv.addObject("hasTwoOrMoreNumbers", stack.size() >= 2);
 		mv.addObject("hasUndoer", undoers.size() > 0);
 		return mv;
@@ -61,28 +67,32 @@ public class CalculatorController {
 	
 	@PostMapping("/add")
 	public ModelAndView addTwoNumbers() {
-		double first = stack.pop();
-		double second = stack.pop();
-		double result = first + second;
-		stack.push(result);
-		undoers.push(new TwoArgumentUndoer(first, second));
-		
-		ModelAndView mv = new ModelAndView();
-		mv.setViewName("redirect:/");
-		return mv;
+		AddTwoNumbersTogether adder = new AddTwoNumbersTogether(stack);
+		return doOperation(adder);
+	}
+	
+	@PostMapping("/divide")
+	public ModelAndView divideTwoNumbers() {
+		DivideTwoNumbersTogether divider = new DivideTwoNumbersTogether(stack);
+		return doOperation(divider);
+	}
+	
+	@PostMapping("/multiply")
+	public ModelAndView multiplyTwoNumbers() {
+		MultiplyTwoNumbersTogether multiplier = new MultiplyTwoNumbersTogether(stack);
+		return doOperation(multiplier);
 	}
 	
 	@PostMapping("/minus")
 	public ModelAndView subtractTwoNumbers() {
-		double first = stack.pop();
-		double second = stack.pop();
-		double result = second - first;
-		stack.push(result);
-		undoers.push(new TwoArgumentUndoer(first, second));
-
-		ModelAndView mv = new ModelAndView();
-		mv.setViewName("redirect:/");
-		return mv;
+		SubtractTwoNumbersTogether minuser = new SubtractTwoNumbersTogether(stack);
+		return doOperation(minuser);
+	}
+	
+	@PostMapping("/exp")
+	public ModelAndView exponentitateTwoNumbers() {
+		ExponentiateTwoNumbersTogether powerer = new ExponentiateTwoNumbersTogether(stack);
+		return doOperation(powerer);
 	}
 	
 	@PostMapping("/undo")
@@ -90,6 +100,15 @@ public class CalculatorController {
 		Undoer undoer = undoers.pop();
 		undoer.undo(stack);
 		
+		ModelAndView mv = new ModelAndView();
+		mv.setViewName("redirect:/");
+		return mv;
+	}
+	
+	private ModelAndView doOperation(TwoNumberCalculation calcy) {
+		calcy.goDoIt();
+		undoers.push(calcy);
+
 		ModelAndView mv = new ModelAndView();
 		mv.setViewName("redirect:/");
 		return mv;

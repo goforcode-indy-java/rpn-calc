@@ -14,7 +14,10 @@ import com.lmig.gfc.rpn.models.ExponentiateTwoNumbersTogether;
 import com.lmig.gfc.rpn.models.Godoer;
 import com.lmig.gfc.rpn.models.ItDoesThePushing;
 import com.lmig.gfc.rpn.models.MultiplyTwoNumbersTogether;
+import com.lmig.gfc.rpn.models.Rotator;
+import com.lmig.gfc.rpn.models.StackClearer;
 import com.lmig.gfc.rpn.models.SubtractTwoNumbersTogether;
+import com.lmig.gfc.rpn.models.Swapper;
 
 @Controller
 public class CalculatorController {
@@ -36,6 +39,7 @@ public class CalculatorController {
 		mv.addObject("stack", stack);
 		mv.addObject("hasOneOrMoreNumbers", stack.size() >= 1);
 		mv.addObject("hasTwoOrMoreNumbers", stack.size() >= 2);
+		mv.addObject("hasThreeOrMoreNumbers", stack.size() >= 3);
 		mv.addObject("hasUndoer", undoers.size() > 0);
 		mv.addObject("hasRedoer", redoers.size() > 0);
 		return mv;
@@ -51,6 +55,24 @@ public class CalculatorController {
 	public ModelAndView absoluteValue() {
 		AbsoluterOfOneNumber absoluter = new AbsoluterOfOneNumber(stack);
 		return doOperation(absoluter);
+	}
+	
+	@PostMapping("/clear")
+	public ModelAndView clearTheStack() {
+		StackClearer clearer = new StackClearer(stack);
+		return doOperation(clearer);
+	}
+	
+	@PostMapping("/swap")
+	public ModelAndView swapMeet() {
+		Swapper swapper = new Swapper(stack);
+		return doOperation(swapper);
+	}
+	
+	@PostMapping("/rotate")
+	public ModelAndView rotatorCuff() {
+		Rotator rotator = new Rotator(stack);
+		return doOperation(rotator);
 	}
 	
 	@PostMapping("/add")
@@ -101,9 +123,9 @@ public class CalculatorController {
 		return redirectToHome();
 	}
 	
-	private ModelAndView doOperation(Godoer calcy) {
-		calcy.goDoIt();
-		undoers.push(calcy);
+	private ModelAndView doOperation(Godoer oppy) {
+		oppy.goDoIt();
+		undoers.push(oppy);
 		redoers.clear();
 		
 		return redirectToHome();

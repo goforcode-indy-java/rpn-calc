@@ -12,6 +12,8 @@ import com.lmig.gfc.rpn.models.AddTwoNumbersTogether;
 import com.lmig.gfc.rpn.models.DivideTwoNumbersTogether;
 import com.lmig.gfc.rpn.models.ExponentiateTwoNumbersTogether;
 import com.lmig.gfc.rpn.models.Godoer;
+import com.lmig.gfc.rpn.models.IndianaCircleArea;
+import com.lmig.gfc.rpn.models.IndianaMath;
 import com.lmig.gfc.rpn.models.ItDoesThePushing;
 import com.lmig.gfc.rpn.models.MultiplyTwoNumbersTogether;
 import com.lmig.gfc.rpn.models.Rotator;
@@ -73,6 +75,18 @@ public class CalculatorController {
 	public ModelAndView rotatorCuff() {
 		Rotator rotator = new Rotator(stack);
 		return doOperation(rotator);
+	}
+	
+	@PostMapping("/stupid-pi")
+	public ModelAndView punkinPi() {
+		ItDoesThePushing pusher = new ItDoesThePushing(stack, IndianaMath.PI);
+		return doOperation(pusher);
+	}
+	
+	@PostMapping("/stupid-circle")
+	public ModelAndView notPurdueCircleButIUCricle() {
+		IndianaCircleArea dumb = new IndianaCircleArea(stack);
+		return doOperation(dumb);
 	}
 	
 	@PostMapping("/add")

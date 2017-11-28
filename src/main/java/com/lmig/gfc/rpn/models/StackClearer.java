@@ -14,15 +14,15 @@ public class StackClearer implements Godoer {
 
 	@Override
 	public void undo(Stack<Double> stack) {
-		moveFromOneStackToAnother(stackOfHolding, sourceStack);
+		moveFromOneStackToAnother(this.stackOfHolding, sourceStack);
 	}
 
 	@Override
 	public void goDoIt() {
-		moveFromOneStackToAnother(sourceStack, stackOfHolding);
+		moveFromOneStackToAnother(this.sourceStack, stackOfHolding);
 	}
 	
-	private void moveFromOneStackToAnother(Stack<Double> from, Stack<Double> to) {
+	private static void moveFromOneStackToAnother(Stack<Double> from, Stack<Double> to) {
 		while (!from.empty()) {
 			Double value = from.pop();
 			to.push(value);
@@ -30,19 +30,3 @@ public class StackClearer implements Godoer {
 	}
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
